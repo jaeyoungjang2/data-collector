@@ -3,16 +3,10 @@ package com.study.elasticsearch.repository;
 
 import com.study.elasticsearch.dto.CollectedDataDto;
 import com.study.elasticsearch.dto.DataCollectReqDto;
-import org.elasticsearch.common.collect.ImmutableOpenMap;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
-/*
- * FIXME 아래와 같이 static 변수로 임시 저장소를 구현할 경우 stackoverflow 를 유발할 수 있음.
- *       여러 Thread 에서 같은 저장소를 사용하려는 구현 의도는 싱글톤을 통해 구현가능하며, 싱글톤을 쓴다면 Spring Bean 으로 만드는 것이 더 좋음.
- */
 /**
  * <h1>메모리 임시 저장소</h1>
  * 수집 요청 받은 데이터를 메모리에 임시로 저장하는 클래스
@@ -23,11 +17,7 @@ public class InMemoryRepository {
     private Queue<CollectedDataDto> repository = new LinkedBlockingQueue<>();
 
     public boolean save(DataCollectReqDto dataCollectReqDto) {
-        /*
-         * FIXME Queue.add() 의 경우 예외를 던지기 때문에, 응답 데이터에 결과(boolean)을 전달하기 위해서는 Queue.offer() 를 사용하는 것이 나아보임.
-         *       엘리먼트 추가 실패 시 blocking 하고 대기하는 것이 안전할 것으로 보이기 때문에 Queue.put() 을 사용하는 것이 베스트.
-         */
-        return this.repository.add(new CollectedDataDto()
+        return this.repository.offer(new CollectedDataDto()
                 .setProdType(dataCollectReqDto.getProdType())
                 .setDataType(dataCollectReqDto.getDataType())
                 .setData(dataCollectReqDto.getData()));
@@ -39,10 +29,7 @@ public class InMemoryRepository {
      */
     public List<CollectedDataDto> getData() {
         List<CollectedDataDto> rtn = new ArrayList<>();
-        //FIXME while 도는 것 보다는 LinkedBlockingQueue.drainTo() 를 사용하는 것이 나아보임
-        while (!this.repository.isEmpty()) {
-            rtn.add(this.repository.poll());
-        }
+        ((LinkedBlockingQueue) this.repository).drainTo(rtn);
         return rtn;
     }
 }
