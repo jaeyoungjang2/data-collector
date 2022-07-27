@@ -16,8 +16,8 @@ public class InMemoryRepository {
 
     private Queue<CollectedDataDto> repository = new LinkedBlockingQueue<>();
 
-    public boolean save(DataCollectReqDto dataCollectReqDto) {
-        return this.repository.offer(new CollectedDataDto()
+    public void save(DataCollectReqDto dataCollectReqDto) throws InterruptedException {
+        ((LinkedBlockingQueue)this.repository).put(new CollectedDataDto()
                 .setProdType(dataCollectReqDto.getProdType())
                 .setDataType(dataCollectReqDto.getDataType())
                 .setData(dataCollectReqDto.getData()));

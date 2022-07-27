@@ -53,7 +53,6 @@ public class FileWriter implements Writer{
      * 1시간 주기로 데이터를 작성할 파일을 생성합니다.
      */
     @Scheduled(fixedDelay = 1000 * 60 * 60L)
-//    @Scheduled(fixedDelay = 1000 * 10L)
     public void createFileTask() throws IOException {
         createFile();
     }
