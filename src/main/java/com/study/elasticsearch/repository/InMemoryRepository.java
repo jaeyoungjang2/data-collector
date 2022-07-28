@@ -30,6 +30,7 @@ public class InMemoryRepository {
     }
 
     public static Set<CollectedDataDto> getData() {
+
         //FIXME 복사를 해서 전달해줘야함.
         return repository;
     }
